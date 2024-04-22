@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const axios = require("axios");
 const fs = require("fs");
+const { Console } = require("console");
 
 // app.get("/deportes", (req, res) => {
 //     // Definir y asignar la variable deportes
@@ -35,12 +36,13 @@ function validarPrecio(precio) {
 app.get("/agregar", async (req, res) => {
   // const { nombre, precio } = req.query: Extrae los parámetros de consulta "nombre" y "precio" de la URL de la solicitud GET y los guarda en variables separadas llamadas "nombre" y "precio".
   const { nombre, precio } = req.query;
+
   if (!validarNombre(nombre)) {
-    return res.status(400).json({ error: "El nombre no es válido" });
+    return res.send("No puedes ingresar números o dejar vacio el campo Nombre");
   }
 
-  if (!validarNombre(precio)) {
-    return res.status(400).json({ error: "El precio no es válido" });
+  if (!validarPrecio(precio) ) {
+    return res.send("Solo puedes ingresar letras o dejar vacio el campo Precio");
   }
 
   // const deporte = { nombre, precio }: Crea un objeto llamado "deporte" con las propiedades "nombre" y "precio" obtenidas de los parámetros de consulta.
@@ -92,38 +94,40 @@ app.get("/deportes", async (req, res) => {
 //RUTA PARA VISUALIZAR DEPORTES uno
 app.get("/deporte/:nombre", async (req, res) => {
   try {
-    let nombre = req.params.nombre; 
-    console.log(nombre);
+    let nombre = req.params.nombre;
     const data = JSON.parse(fs.readFileSync("deportes.json", "utf8"));
-    // console.log(data);
     let deportes = data.deportes;
-    console.log("valor de deporrtes  :" + deportes[0])
-    let busqueda = deportes.findIndex((elem) => elem.nombre == deportes); 
+
+    // Iterar sobre cada objeto de deporte en el arreglo
+    let busqueda = deportes.findIndex((elem) => elem.nombre == nombre);
+    console.log("Índice de la búsqueda:", busqueda);
 
     if (busqueda == -1) {
-      console.log("El usuario con nombre: " + nombre + " no existe"); 
-      return res.send("El usuario buscado no existe");
+      return res.send("El deporte con nombre: " + nombre + " no existe");
     } else {
-      console.log("El usuario es: ", usuarios[busqueda]);
-      res.send(usuarios[busqueda]); // Devuelve el usuario encontrado
+      console.log("El deporte es:", deportes[busqueda]);
+      return res.json(deportes[busqueda]); // Devuelve el deporte encontrado
     }
-    console.log("El usuario es: ", usuarios[busqueda]);
-    res.send(usuarios[busqueda]); // Devuelve el usuario encontrado
-
-    res.send("busqueda finalizada");
   } catch (error) {
-    res.status(500).send("Algo salió mal...");
+    console.error("Error:", error);
+    return res.status(500).send("Algo salió mal...");
   }
 });
 
+
 //RUTA PARA MODIFICAR DEPORTES
 app.get("/modificar/:precio", async (req, res) => {
-  const precio = req.params.precio;
-  console.log(precio);
+
   try {
+    const precio = req.params.precio;
+    console.log("valor input",precio);
     const data = JSON.parse(fs.readFileSync("deportes.json", "utf8"));
-    const deporte = data.deportes.find((d) => d.precio === precio);
-    console.log(deporte);
+    let precios = data.deportes;
+    console.log("acá que pasa: ", precios);
+    const busquedaPrecio = precios.find((d) => d.precio == precio);
+    console.log("acá se regleja",busquedaPrecio);
+
+
     if (deporte) {
       res.send(deporte);
     } else {
