@@ -1,1 +1,8 @@
-{"deportes":[{"nombre":"tenis","precio":"2000"}]}
+{
+  "deportes": [
+    {
+      "nombre": "tenis",
+      "precio": "2000"
+    }
+  ]
+}

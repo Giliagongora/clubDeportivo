@@ -36,13 +36,16 @@ function validarPrecio(precio) {
 app.get("/agregar", async (req, res) => {
   // const { nombre, precio } = req.query: Extrae los parámetros de consulta "nombre" y "precio" de la URL de la solicitud GET y los guarda en variables separadas llamadas "nombre" y "precio".
   const { nombre, precio } = req.query;
-
-  if (!validarNombre(nombre)) {
-    return res.send("No puedes ingresar números o dejar vacio el campo Nombre");
+  if (nombre === "" || precio === "") {
+    return res.send("No puedes dejar los campos vacios");
   }
 
-  if (!validarPrecio(precio) ) {
-    return res.send("Solo puedes ingresar letras o dejar vacio el campo Precio");
+  if (!validarNombre(nombre)) {
+    return res.send("No puedes ingresar números en el campo Nombre");
+  }
+
+  if (!validarPrecio(precio)) {
+    return res.send("No puedes ingresar letras en el campo Precio");
   }
 
   // const deporte = { nombre, precio }: Crea un objeto llamado "deporte" con las propiedades "nombre" y "precio" obtenidas de los parámetros de consulta.
@@ -54,26 +57,51 @@ app.get("/agregar", async (req, res) => {
   try {
     // const data = JSON.parse(fs.readFileSync("deportes.json", "utf8")): Lee el contenido del archivo "deportes.json" de manera síncrona y lo convierte en un objeto JavaScript utilizando JSON.parse. Esto guarda el contenido del archivo en la variable "data".
     const data = JSON.parse(fs.readFileSync("deportes.json", "utf8"));
-    // if (!data.deportes) { ... }: Verifica si la propiedad "deportes" no está definida en el objeto "data". Si es así, inicializa "deportes" como un arreglo vacío.
-    if (!data.deportes) {
-      data.deportes = [];
-      // Inicializar 'deportes' como un array vacío si es undefined
-    }
-    // const deportes = data.deportes;: Guarda el arreglo de deportes del objeto "data" en una variable llamada "deportes".
-    const deportes = data.deportes;
+
+    let deportes = data.deportes;
+
+    // Iterar sobre cada objeto de deporte en el arreglo
+    // let busqueda = deportes.filter((elem) => elem.nombre == nombre);
+    // let busqueda = deportes.filter((elem) => elem.includes(nombre));
+    // let busqueda = deportes.filter((elem) => elem.nombre.includes(nombre));
+    let busqueda = deportes.filter((elem) => elem.nombre.includes(nombre)).map((elem) => elem.nombre);
+
+
+    // let busqueda1 = deportes.filter((elem) => elem.nombre == nombre);
+    // const result = deportes.filter((nombre) => nombre == nombre);
+    console.log("Índice de la búsqueda:", busqueda);
+
+    // console.log("Índice de la búsqueda elemt:", elem);
+    // console.log("resultado:", result);
+    if (busqueda == nombre) {
+      return res.send("El deporte con nombre: " + busqueda + " ya existe");
+    } else {
     // deportes.push(deporte);: Agrega el objeto "deporte" al arreglo "deportes".
     deportes.push(deporte);
-    // fs.writeFileSync("deportes.json", JSON.stringify(data)): Convierte el objeto "data" a formato JSON y escribe el contenido en el archivo "deportes.json", sobrescribiendo su contenido anterior de manera síncrona.
-    fs.writeFileSync("deportes.json", JSON.stringify(data));
-    console.log(data);
-    // res.send("deporte almacenado con éxito");: Envía una respuesta al cliente indicando que el deporte ha sido almacenado con éxito.
-    return res.send("Deporte almacenado con éxito");
-    return res.send({
-      status: 200,
-      error: "false",
-      msg: "Usuario almacenado con éxito",
-      datos: deporte,
-    });
+        // fs.writeFileSync("deportes.json", JSON.stringify(data)): Convierte el objeto "data" a formato JSON y escribe el contenido en el archivo "deportes.json", sobrescribiendo su contenido anterior de manera síncrona.
+        fs.writeFileSync("deportes.json", JSON.stringify(data));
+        // console.log(data);
+    
+        // res.send("deporte almacenado con éxito");: Envía una respuesta al cliente indicando que el deporte ha sido almacenado con éxito.
+        return res.send("Deporte almacenado con éxito");
+        return res.send({
+          status: 200,
+          error: "false",
+          msg: "Usuario almacenado con éxito",
+          datos: deporte,
+        });
+
+        console.log("El deporteeeeeeeee :", busqueda, " se agregó");
+        // return res.json("El deporte :"+ busqueda + " se agregó"); // Devuelve el deporte encontrado
+        return res.send("El deporteeeeeeee :"+ busqueda + " se agregó"); // Devuelve el deporte encontrado
+    }
+
+    // const deportes = data.deportes;: Guarda el arreglo de deportes del objeto "data" en una variable llamada "deportes".
+    // console.log("el resultado de la búsqueda : ", busqueda);
+
+
+
+
   } catch (error) {
     res.status(500).send("Algo salió mal...");
   }
@@ -114,19 +142,16 @@ app.get("/deporte/:nombre", async (req, res) => {
   }
 });
 
-
 //RUTA PARA MODIFICAR DEPORTES
 app.get("/modificar/:precio", async (req, res) => {
-
   try {
     const precio = req.params.precio;
-    console.log("valor input",precio);
+    console.log("valor input", precio);
     const data = JSON.parse(fs.readFileSync("deportes.json", "utf8"));
     let precios = data.deportes;
     console.log("acá que pasa: ", precios);
     const busquedaPrecio = precios.find((d) => d.precio == precio);
-    console.log("acá se regleja",busquedaPrecio);
-
+    console.log("acá se regleja", busquedaPrecio);
 
     if (deporte) {
       res.send(deporte);
