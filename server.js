@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 });
 
 function validarNombre(nombre) {
-  return /^[a-zA-Z]+$/.test(nombre);
+  return /^[a-zA-Z ]+$/.test(nombre);
 }
 function validarPrecio(precio) {
   return /^[0-9]+$/.test(precio);
@@ -61,9 +61,6 @@ app.get("/agregar", async (req, res) => {
     let deportes = data.deportes;
 
     // Iterar sobre cada objeto de deporte en el arreglo
-    // let busqueda = deportes.filter((elem) => elem.nombre == nombre);
-    // let busqueda = deportes.filter((elem) => elem.includes(nombre));
-    // let busqueda = deportes.filter((elem) => elem.nombre.includes(nombre));
     let busqueda = deportes.filter((elem) => elem.nombre.includes(nombre)).map((elem) => elem.nombre);
 
 
@@ -80,7 +77,6 @@ app.get("/agregar", async (req, res) => {
     deportes.push(deporte);
         // fs.writeFileSync("deportes.json", JSON.stringify(data)): Convierte el objeto "data" a formato JSON y escribe el contenido en el archivo "deportes.json", sobrescribiendo su contenido anterior de manera síncrona.
         fs.writeFileSync("deportes.json", JSON.stringify(data));
-        // console.log(data);
     
         // res.send("deporte almacenado con éxito");: Envía una respuesta al cliente indicando que el deporte ha sido almacenado con éxito.
         return res.send("Deporte almacenado con éxito");
